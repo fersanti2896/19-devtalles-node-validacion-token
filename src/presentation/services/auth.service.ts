@@ -19,13 +19,17 @@ export class AuthService {
             await user.save();
 
             //* JWT
+            const token = await JwtAdapter.generateToken({ id: user.id });
+
+            if( !token ) throw CustomError.internalServer('Error while creating JWT.');
+            
             //* Email de confirmación
 
             const { password, ...userEntity } = UserEntity.fromObject( user );
 
             return { 
                 user: userEntity,
-                token: 'ABC'
+                token
             };
         } catch (error) {
             throw CustomError.internalServer(`${ error }`);
@@ -45,7 +49,7 @@ export class AuthService {
             const { password, ...userEntity } = UserEntity.fromObject( existUser );
             const token = await JwtAdapter.generateToken({ id: existUser.id });
 
-            if( !token ) throw CustomError.internalServer('Error while creating JWT.')
+            if( !token ) throw CustomError.internalServer('Error while creating JWT.');
 
             return {
                 user: userEntity,
